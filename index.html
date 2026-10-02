@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hotel Overlook Resort y Spa</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body class="min-h-screen text-gray-900 flex flex-col">
+
+    <div id="toast-container" class="fixed top-5 right-5 z-50 flex flex-col gap-3"></div>
+
+    <!-- Main Overlay -->
+    <div class="min-h-screen bg-slate-900/40 w-full flex-grow flex items-center justify-center p-4 sm:p-6 md:p-8">
+        
+        <!-- App Container -->
+        <div class="glass-container w-full max-w-5xl rounded-3xl overflow-hidden shadow-2xl relative flex flex-col" style="max-height: 90vh;">
+            
+            <!-- Navbar -->
+            <nav class="p-4 border-b border-white/30 flex justify-between items-center bg-white/10">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-hotel text-blue-800 text-2xl"></i>
+                    <h1 class="text-xl md:text-2xl font-bold text-gray-900 tracking-tight">OVERLOOK <span class="font-light">RESORT Y SPA</span></h1>
+                </div>
+                <button id="mobile-menu-button" class="md:hidden text-gray-900 text-xl" aria-label="Abrir menú" aria-expanded="false">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+                <div id="main-menu" class="hidden md:flex gap-6 text-sm font-semibold text-gray-800">
+                    <a href="#" class="hover:text-blue-700 transition" onclick="navTo('view-home'); return false;">Inicio</a>
+                    <a href="#" class="hover:text-blue-700 transition" onclick="navTo('view-rooms'); return false;">Habitaciones</a>
+                    <a href="#" class="hover:text-blue-700 transition" onclick="navTo('view-services'); return false;">Servicios</a>
+                    <a href="#" class="hover:text-blue-700 transition" onclick="navTo('view-bookings'); return false;">Mis reservaciones</a>
+                    <a href="#" class="hover:text-blue-700 transition" onclick="navTo('view-gallery'); return false;">Galería</a>
+                    <a href="#" class="hover:text-blue-700 transition" onclick="navTo('view-contact'); return false;">Contacto</a>
+                </div>
+            </nav>
+
+            <!-- Scrollable Content Area -->
+            <div class="overflow-y-auto flex-grow p-6 md:p-10 relative">
+
+                <div id="view-home" class="view-section fade-in flex flex-col justify-center h-full min-h-[400px]">
+                    <div class="max-w-2xl">
+                        <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-4 drop-shadow-md">Bienvenido al paraíso</h2>
+                        <p class="text-lg text-gray-800 mb-8 font-medium drop-shadow-sm">Encuentra la habitación ideal para tu estancia inmersiva y relajante.</p>
+                        
+                        <div class="glass-card rounded-2xl p-6 shadow-lg">
+                            <form id="search-form" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div>
+                                    <label class="block text-sm font-bold text-gray-800 mb-1">Llegada</label>
+                                    <input type="date" id="checkin" class="glass-input w-full rounded-xl px-4 py-3" required>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-bold text-gray-800 mb-1">Salida</label>
+                                    <input type="date" id="checkout" class="glass-input w-full rounded-xl px-4 py-3" required>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-bold text-gray-800 mb-1">Huéspedes</label>
+                                    <select id="guests" class="glass-input w-full rounded-xl px-4 py-3">
+                                        <option value="1">1 Persona</option>
+                                        <option value="2" selected>2 Personas</option>
+                                        <option value="3">3 Personas</option>
+                                        <option value="4">4 Personas</option>
+                                        <option value="5">Familia (5)</option>
+                                    </select>
+                                </div>
+                                <div class="md:col-span-3 mt-2">
+                                    <button type="button" onclick="handleSearch()" class="w-full bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white font-bold py-3 px-6 rounded-xl shadow-lg transform transition active:scale-95 text-lg">
+                                        BUSCAR HABITACIONES <i class="fa-solid fa-arrow-right ml-2"></i>
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="view-results" class="view-section view-hidden fade-in">
+                    <button onclick="navTo('view-home')" class="mb-6 text-gray-800 font-bold hover:text-blue-800 transition flex items-center gap-2">
+                        <i class="fa-solid fa-arrow-left"></i> Modificar búsqueda
+                    </button>
+                    <h3 class="text-2xl font-bold mb-6 text-gray-900 drop-shadow-sm">Habitaciones disponibles para tus fechas</h3>
+                    
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6" id="rooms-container">
+                        <!-- Room Cards injected via JS -->
+                    </div>
+                </div>
+
+                <div id="view-rooms" class="view-section view-hidden fade-in">
+                    <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-3 mb-6">
+                        <div>
+                            <p class="text-sm font-bold uppercase tracking-widest text-blue-900">Descansa a tu manera</p>
+                            <h3 class="text-3xl font-bold text-gray-900">Nuestras habitaciones</h3>
+                        </div>
+                        <button onclick="navTo('view-home')" class="text-gray-800 font-bold hover:text-blue-800 transition flex items-center gap-2">
+                            <i class="fa-solid fa-calendar-check"></i> Buscar por fechas
+                        </button>
+                    </div>
+                    <div class="glass-card rounded-2xl p-4 mb-6 grid grid-cols-1 md:grid-cols-3 gap-3">
+                        <label class="text-sm font-bold text-gray-800">Precio máximo
+                            <input id="room-price-filter" type="range" min="1800" max="5200" step="100" value="5200" class="w-full accent-blue-700">
+                            <span id="room-price-label" class="text-blue-900">$5,200 MXN</span>
+                        </label>
+                        <label class="text-sm font-bold text-gray-800">Capacidad mínima
+                            <select id="room-capacity-filter" class="glass-input w-full rounded-xl px-3 py-2 mt-1"><option value="1">1 huésped</option><option value="2" selected>2 huéspedes</option><option value="3">3 huéspedes</option><option value="4">4 huéspedes</option></select>
+                        </label>
+                        <label class="text-sm font-bold text-gray-800">Ordenar por
+                            <select id="room-sort" class="glass-input w-full rounded-xl px-3 py-2 mt-1"><option value="price">Precio menor</option><option value="capacity">Capacidad</option><option value="name">Nombre</option></select>
+                        </label>
+                    </div>
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6" id="all-rooms-container"></div>
+                </div>
+
+                <div id="view-services" class="view-section view-hidden fade-in">
+                    <div class="mb-6">
+                        <p class="text-sm font-bold uppercase tracking-widest text-blue-900">Todo en un solo lugar</p>
+                        <h3 class="text-3xl font-bold text-gray-900">Servicios del resort</h3>
+                        <p class="text-gray-800 font-medium mt-2">Añade comodidad, sabor y bienestar a cada momento de tu estancia.</p>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5" id="services-container"></div>
+                </div>
+
+                <div id="view-bookings" class="view-section view-hidden fade-in">
+                    <div class="flex items-end justify-between gap-3 mb-6">
+                        <div>
+                            <p class="text-sm font-bold uppercase tracking-widest text-blue-900">Tu historial</p>
+                            <h3 class="text-3xl font-bold text-gray-900">Mis reservaciones</h3>
+                        </div>
+                        <button onclick="navTo('view-home')" class="text-gray-800 font-bold hover:text-blue-800 transition flex items-center gap-2">
+                            <i class="fa-solid fa-plus"></i> Nueva reserva
+                        </button>
+                    </div>
+                    <div id="bookings-container"></div>
+                </div>
+
+                <div id="view-gallery" class="view-section view-hidden fade-in">
+                    <div class="mb-6"><p class="text-sm font-bold uppercase tracking-widest text-blue-900">Conoce Overlook</p><h3 class="text-3xl font-bold text-gray-900">Galería del resort</h3></div>
+                    <div class="grid grid-cols-2 md:grid-cols-3 gap-4" id="gallery-container"></div>
+                </div>
+
+                <div id="view-contact" class="view-section view-hidden fade-in max-w-2xl mx-auto">
+                    <div class="mb-6"><p class="text-sm font-bold uppercase tracking-widest text-blue-900">Estamos para ayudarte</p><h3 class="text-3xl font-bold text-gray-900">Contacto</h3></div>
+                    <form id="contact-form" class="glass-card rounded-2xl p-6 space-y-4">
+                        <input id="contact-name" class="glass-input w-full rounded-xl px-4 py-3" placeholder="Tu nombre" required>
+                        <input id="contact-email" type="email" class="glass-input w-full rounded-xl px-4 py-3" placeholder="Correo electrónico" required>
+                        <select id="contact-topic" class="glass-input w-full rounded-xl px-4 py-3"><option>Información general</option><option>Reservaciones</option><option>Eventos y grupos</option><option>Quejas o sugerencias</option></select>
+                        <textarea id="contact-message" class="glass-input w-full rounded-xl px-4 py-3 min-h-32" placeholder="¿Cómo podemos ayudarte?" required></textarea>
+                        <button class="w-full bg-blue-700 hover:bg-blue-800 text-white font-bold py-3 rounded-xl" type="submit">ENVIAR MENSAJE</button>
+                    </form>
+                    <div class="glass-card rounded-2xl p-5 mt-5 text-gray-800 font-medium"><p><i class="fa-solid fa-phone text-blue-800 mr-2"></i> +52 800 555 0199</p><p class="mt-2"><i class="fa-solid fa-envelope text-blue-800 mr-2"></i> hola@overlookresort.mx</p><p class="mt-2"><i class="fa-solid fa-location-dot text-blue-800 mr-2"></i> Riviera Maya, México</p></div>
+                </div>
+
+                <div id="view-details" class="view-section view-hidden fade-in">
+                    <button onclick="navTo('view-results')" class="mb-6 text-gray-800 font-bold hover:text-blue-800 transition flex items-center gap-2">
+                        <i class="fa-solid fa-arrow-left"></i> Regresar a resultados
+                    </button>
+                    
+                    <div class="glass-card rounded-2xl overflow-hidden flex flex-col md:flex-row">
+                        <div class="md:w-1/2 h-64 md:h-auto bg-cover bg-center" id="detail-img"></div>
+                        <div class="p-6 md:p-8 md:w-1/2 flex flex-col justify-between">
+                            <div>
+                                <h3 class="text-3xl font-bold text-gray-900 mb-2" id="detail-title">Room Name</h3>
+                                <p class="text-sm text-gray-700 font-semibold mb-4" id="detail-capacity"><i class="fa-solid fa-users mr-2"></i> Capacidad</p>
+                                
+                                <div class="mb-6">
+                                    <h4 class="font-bold text-gray-900 mb-2">Amenidades:</h4>
+                                    <ul class="grid grid-cols-2 gap-2 text-sm font-medium text-gray-800" id="detail-amenities">
+                                        <!-- Amenities injected via JS -->
+                                    </ul>
+                                </div>
+                                <div class="mb-6">
+                                    <h4 class="font-bold text-gray-900 mb-2">Disponibilidad:</h4>
+                                    <div id="availability-calendar" class="grid grid-cols-7 gap-2 text-center text-xs font-bold"></div>
+                                </div>
+                                <div class="mb-6 text-sm text-gray-700 bg-white/30 p-3 rounded-lg border border-white/40">
+                                    <p><strong>Políticas:</strong> Cancelación gratuita hasta 48 horas antes. Check-in 15:00 hrs. Check-out 12:00 hrs.</p>
+                                </div>
+                            </div>
+                            
+                            <div class="border-t border-white/50 pt-4 mt-auto">
+                                <div class="flex justify-between items-end mb-4">
+                                    <span class="text-gray-800 font-bold">Total estimado:</span>
+                                    <span class="text-2xl font-bold text-blue-900" id="detail-total">$0 MXN</span>
+                                </div>
+                                <button onclick="navTo('view-confirm')" class="w-full bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white font-bold py-3 px-6 rounded-xl shadow-lg transition active:scale-95">
+                                    CONTINUAR CON RESERVACIÓN
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="view-confirm" class="view-section view-hidden fade-in max-w-3xl mx-auto">
+                    <button onclick="navTo('view-details')" class="mb-6 text-gray-800 font-bold hover:text-blue-800 transition flex items-center gap-2">
+                        <i class="fa-solid fa-arrow-left"></i> Modificar selección
+                    </button>
+
+                    <h3 class="text-3xl font-bold text-gray-900 mb-6 drop-shadow-sm">Confirma tu reservación</h3>
+
+                    <div class="glass-card rounded-2xl p-6 md:p-8 mb-6">
+                        <h4 class="text-xl font-bold border-b border-gray-400/30 pb-2 mb-4 text-gray-900"><i class="fa-solid fa-check-circle text-green-600 mr-2"></i> Datos verificados</h4>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-gray-800 font-medium text-lg mb-6">
+                            <div><span class="text-gray-600 text-sm block">Llegada:</span> <span id="confirm-checkin">-</span></div>
+                            <div><span class="text-gray-600 text-sm block">Salida:</span> <span id="confirm-checkout">-</span></div>
+                            <div><span class="text-gray-600 text-sm block">Habitación:</span> <span id="confirm-room">-</span></div>
+                            <div><span class="text-gray-600 text-sm block">Huéspedes:</span> <span id="confirm-guests">-</span></div>
+                        </div>
+                        
+                        <div class="bg-blue-900/10 rounded-xl p-4 flex justify-between items-center border border-blue-900/20">
+                            <span class="font-bold text-gray-900">Costo Total:</span>
+                            <span class="text-2xl font-bold text-blue-900" id="confirm-total">$0 MXN</span>
+                        </div>
+                        <div class="mt-4">
+                            <label class="text-sm font-bold text-gray-800">Servicios adicionales</label>
+                            <div id="confirm-services" class="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-2"></div>
+                        </div>
+                        <div class="flex gap-2 mt-4">
+                            <input id="coupon-code" class="glass-input flex-1 rounded-xl px-4 py-2" placeholder="Código de descuento">
+                            <button id="apply-coupon" type="button" class="bg-gray-800 text-white font-bold px-4 rounded-xl">APLICAR</button>
+                        </div>
+                        <p id="coupon-message" class="text-sm font-bold text-green-700 mt-2"></p>
+                    </div>
+
+                    <!-- Auth Section -->
+                    <div class="glass-card rounded-2xl p-6 md:p-8">
+                        <div id="auth-section">
+                            <h4 class="text-lg font-bold text-gray-900 mb-4">Inicia sesión para completar la reserva</h4>
+                            <button id="btn-google-login" class="w-full bg-white hover:bg-gray-50 text-gray-800 font-bold py-3 px-6 border border-gray-300 rounded-xl shadow-sm transition flex items-center justify-center gap-3 mb-4">
+                                <img src="https://www.svgrepo.com/show/475656/google-color.svg" class="w-6 h-6" alt="Google">
+                                Iniciar con Google
+                            </button>
+                            <div class="mb-4 border-t border-gray-300 pt-4">
+                                <p class="text-xs font-bold uppercase text-gray-600 mb-2">O ingresa con email</p>
+                                <input id="login-email" type="email" class="glass-input w-full rounded-xl px-4 py-3 mb-3" placeholder="Correo electrónico">
+                                <input id="login-password" type="password" class="glass-input w-full rounded-xl px-4 py-3 mb-3" placeholder="Contraseña">
+                                <button id="btn-email-login" type="button" class="w-full bg-blue-700 hover:bg-blue-800 text-white font-bold py-3 px-6 rounded-xl shadow-sm transition">
+                                    Iniciar sesión
+                                </button>
+                            </div>
+                            <p class="text-xs text-gray-600 text-center">Tus datos están protegidos y solo se usan para gestionar tu reserva.</p>
+                        </div>
+                        
+                        <div id="logged-in-section" class="hidden">
+                            <div class="flex items-center gap-3 mb-6 bg-green-500/20 p-3 rounded-lg border border-green-500/40">
+                                <i class="fa-solid fa-user-check text-green-700 text-xl"></i>
+                                <span id="logged-user-label" class="font-bold text-gray-900">Sesión iniciada correctamente.</span>
+                            </div>
+
+                            <label class="flex items-start gap-3 mb-6 cursor-pointer group">
+                                <input type="checkbox" id="policy-checkbox" class="mt-1 w-5 h-5 accent-blue-600 rounded">
+                                <span class="text-sm text-gray-800 font-medium group-hover:text-gray-900 transition">
+                                    He leído y acepto las políticas de reservación, cancelación y el aviso de privacidad del Hotel Overlook Resort y Spa.
+                                </span>
+                            </label>
+
+                            <button id="btn-confirm-booking" class="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-bold py-4 px-6 rounded-xl shadow-lg transition active:scale-95 text-lg disabled:opacity-50 disabled:cursor-not-allowed">
+                                CONFIRMAR RESERVACIÓN
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="success-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+                    <div class="glass-card w-full max-w-md rounded-3xl p-8 text-center bg-white/90">
+                        <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4 border-4 border-green-500">
+                            <i class="fa-solid fa-check text-4xl text-green-600"></i>
+                        </div>
+                        <h2 class="text-3xl font-bold text-gray-900 mb-2">¡Reservación Exitosa!</h2>
+                        <p class="text-gray-700 mb-6 font-medium">Hemos enviado los detalles a tu correo electrónico. ¡Te esperamos pronto en Overlook Resort y Spa!</p>
+                        <button onclick="location.reload()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-xl transition">
+                            Volver al inicio
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="assets/js/app.js"></script>
+</body>
+</html>
