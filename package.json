@@ -1,0 +1,23 @@
+{
+  "name": "tap-booking-ui-lib",
+  "version": "1.0.0",
+  "description": "Librería JavaScript sin dependencias para funciones y widgets de reservación hotelera.",
+  "type": "module",
+  "main": "./src/index.js",
+  "module": "./src/index.js",
+  "exports": {
+    ".": "./src/index.js",
+    "./style.css": "./src/style.css"
+  },
+  "files": [
+    "src"
+  ],
+  "scripts": {
+    "test": "node --test",
+    "pack:check": "npm pack --dry-run"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "license": "UNLICENSED"
+}

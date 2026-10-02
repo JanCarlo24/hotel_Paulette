@@ -1,5 +1,17 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithCustomToken, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import {
+            HOTEL_COUPONS as VALID_COUPONS,
+            HOTEL_GALLERY as GALLERY,
+            HOTEL_ROOMS as ROOMS,
+            HOTEL_SERVICES as SERVICES,
+            calculateBookingTotal,
+            calculateNights,
+            formatMoney,
+            getStoredBookings,
+            isRoomAvailable as checkRoomAvailability,
+            saveStoredBookings
+        } from '../../src/index.js';
 
         // Firebase Initialization
         let auth;
@@ -13,56 +25,6 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
             console.error("Firebase config error:", e);
         }
 
-        // Mock Database for Rooms
-        const ROOMS = [
-            {
-                id: 'room-1',
-                name: 'De Luxe Sea View',
-                capacity: '2 adultos y 1 niño',
-                maxGuests: 3,
-                price: 2450,
-                img: 'https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=800&q=80',
-                amenities: ['Vista al mar', 'Cama King Size', 'Balcón privado', 'Room service 24/7', 'Wi-Fi alta velocidad', 'Tina de hidromasaje']
-            },
-            {
-                id: 'room-2',
-                name: 'Suite Presidencial',
-                capacity: 'Hasta 4 adultos',
-                maxGuests: 4,
-                price: 5200,
-                img: 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=800&q=80',
-                amenities: ['Vista panorámica', 'Dos habitaciones', 'Sala de estar', 'Chef privado opcional', 'Acceso al Spa', 'Terraza privada']
-            },
-            {
-                id: 'room-3',
-                name: 'Standard Tropical',
-                capacity: '2 adultos',
-                maxGuests: 2,
-                price: 1800,
-                img: 'https://images.unsplash.com/photo-1598928506311-c55dd1b31bb1?auto=format&fit=crop&w=800&q=80',
-                amenities: ['Vista al jardín', 'Cama Queen Size', 'Minibar', 'Smart TV', 'Aire acondicionado']
-            }
-        ];
-
-        const SERVICES = [
-            { id: 'spa', name: 'Circuito de Spa', description: 'Relajación profunda con sauna, vapor y jacuzzi.', price: 850, icon: 'fa-spa' },
-            { id: 'breakfast', name: 'Desayuno buffet', description: 'Sabores locales y opciones para toda la familia.', price: 320, icon: 'fa-mug-hot' },
-            { id: 'transfer', name: 'Traslado aeropuerto', description: 'Viaje privado de llegada o salida sin complicaciones.', price: 1200, icon: 'fa-car' },
-            { id: 'dinner', name: 'Cena romántica', description: 'Menú de cuatro tiempos en una terraza privada.', price: 1450, icon: 'fa-champagne-glasses' },
-            { id: 'tour', name: 'Tour de cenotes', description: 'Excursión guiada para descubrir la Riviera Maya.', price: 1100, icon: 'fa-water' },
-            { id: 'kids', name: 'Club infantil', description: 'Actividades supervisadas para pequeños viajeros.', price: 450, icon: 'fa-puzzle-piece' }
-        ];
-
-        const GALLERY = [
-            'https://images.unsplash.com/photo-1540541338287-41700207dee6?auto=format&fit=crop&w=800&q=80',
-            'https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=800&q=80',
-            'https://images.unsplash.com/photo-1544161515-4ab6ce6db874?auto=format&fit=crop&w=800&q=80',
-            'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?auto=format&fit=crop&w=800&q=80',
-            'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=800&q=80',
-            'https://images.unsplash.com/photo-1530789253388-582c481c54b0?auto=format&fit=crop&w=800&q=80'
-        ];
-        const VALID_COUPONS = { OVERLOOK10: 0.10, BIENVENIDO: 0.10 };
-
         // Global State
         const state = {
             checkIn: '',
@@ -75,19 +37,17 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
             user: null
         };
 
-        const getBookings = () => {
-            try { return JSON.parse(localStorage.getItem('overlookBookings') || '[]'); }
-            catch { return []; }
-        };
-        const saveBookings = (bookings) => localStorage.setItem('overlookBookings', JSON.stringify(bookings));
-        const getTotal = () => {
-            const roomTotal = state.selectedRoom ? state.selectedRoom.price * state.nights : 0;
-            const servicesTotal = state.selectedServices.reduce((sum, serviceId) => {
-                const service = SERVICES.find(item => item.id === serviceId);
-                return sum + (service ? service.price : 0);
-            }, 0);
-            return Math.max(0, (roomTotal + servicesTotal) * (1 - state.discount));
-        };
+        const getBookings = () => getStoredBookings(localStorage);
+        const saveBookings = (bookings) => saveStoredBookings(localStorage, bookings);
+        const getTotal = () => state.selectedRoom
+            ? calculateBookingTotal({
+                room: state.selectedRoom,
+                nights: state.nights,
+                serviceIds: state.selectedServices,
+                services: SERVICES,
+                discount: state.discount
+            })
+            : 0;
 
         function ensureFirebaseReady() {
             const raw = typeof __firebase_config !== 'undefined' ? __firebase_config : '{}';
@@ -127,14 +87,8 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
             }
         }
 
-        function isDateOverlap(start1, end1, start2, end2) {
-            return new Date(start1) < new Date(end2) && new Date(end1) > new Date(start2);
-        }
-
         function isRoomAvailable(roomId, checkIn, checkOut) {
-            if (!checkIn || !checkOut) return true;
-            const bookings = getBookings();
-            return !bookings.some(booking => booking.roomId === roomId && isDateOverlap(checkIn, checkOut, booking.checkIn, booking.checkOut));
+            return checkRoomAvailability(roomId, checkIn, checkOut, getBookings());
         }
 
         function renderAvailabilityCalendar() {
@@ -191,18 +145,6 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
         }
 
         // Formatting currency
-        const formatMoney = (amount) => {
-            return new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(amount) + ' MXN';
-        }
-
-        // Calculate nights
-        const calculateNights = (inDate, outDate) => {
-            const date1 = new Date(inDate);
-            const date2 = new Date(outDate);
-            const diffTime = Math.abs(date2 - date1);
-            return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-        }
-
         function roomCard(room) {
             const nights = state.nights || 1;
             return `<div class="glass-card rounded-2xl overflow-hidden flex flex-col h-full">

@@ -1,0 +1,101 @@
+:root {
+    --hotel-font-family: 'Inter', sans-serif;
+    --hotel-color-primary: #2563eb;
+    --hotel-color-primary-dark: #1d4ed8;
+    --hotel-color-secondary: #4338ca;
+    --hotel-color-text: #111827;
+    --hotel-color-muted: #4b5563;
+    --hotel-color-surface: rgba(255, 255, 255, 0.4);
+    --hotel-color-success: #16a34a;
+    --hotel-color-error: #dc2626;
+}
+
+.bt-booking-widget {
+    color: var(--hotel-color-text);
+    font-family: var(--hotel-font-family);
+}
+
+.bt-booking-form {
+    display: grid;
+    gap: 1rem;
+    padding: 1.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    border-radius: 1rem;
+    background: var(--hotel-color-surface);
+    backdrop-filter: blur(8px);
+}
+
+.bt-booking-form label,
+.bt-booking-form fieldset {
+    display: grid;
+    gap: 0.5rem;
+}
+
+.bt-booking-form input:not([type='checkbox']),
+.bt-booking-form select {
+    width: 100%;
+    min-height: 2.75rem;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid rgba(75, 85, 99, 0.35);
+    border-radius: 0.65rem;
+    background: rgba(255, 255, 255, 0.8);
+    color: var(--hotel-color-text);
+    font: inherit;
+}
+
+.bt-booking-dates {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+}
+
+.bt-booking-form fieldset {
+    grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+    padding: 1rem;
+    border: 1px solid rgba(75, 85, 99, 0.3);
+    border-radius: 0.75rem;
+}
+
+.bt-booking-form fieldset legend {
+    padding: 0 0.35rem;
+    font-weight: 700;
+}
+
+.bt-booking-form .bt-booking-service {
+    display: flex;
+    align-items: center;
+}
+
+.bt-booking-total {
+    margin: 0;
+    color: var(--hotel-color-primary-dark);
+    font-size: 1.1rem;
+    font-weight: 700;
+}
+
+.bt-booking-message {
+    min-height: 1.5rem;
+    margin: 0;
+}
+
+.bt-booking-form button {
+    min-height: 3rem;
+    padding: 0.75rem 1rem;
+    border: 0;
+    border-radius: 0.75rem;
+    background: linear-gradient(90deg, var(--hotel-color-primary), var(--hotel-color-secondary));
+    color: white;
+    cursor: pointer;
+    font: inherit;
+    font-weight: 700;
+}
+
+.bt-booking-form button:hover {
+    background: linear-gradient(90deg, var(--hotel-color-primary-dark), #3730a3);
+}
+
+@media (max-width: 36rem) {
+    .bt-booking-dates {
+        grid-template-columns: 1fr;
+    }
+}
